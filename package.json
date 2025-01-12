@@ -1,0 +1,24 @@
+{
+  "name": "pcat",
+  "version": "1.0.0",
+  "description": "PCAT photo app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sametcandan14/pcat.git"
+  },
+  "keywords": [
+    "photo",
+    "app",
+    "camera"
+  ],
+  "author": "Samet Candan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sametcandan14/pcat/issues"
+  },
+  "homepage": "https://github.com/sametcandan14/pcat#readme"
+}
