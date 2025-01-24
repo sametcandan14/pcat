@@ -2,7 +2,11 @@ const express = require("express");
 const ejs = require("ejs");
 const mongoose = require("mongoose");
 
+const fileUpload = require("express-fileupload");
+
 const Photo = require("./models/Photo");
+
+const fs = require("fs");
 
 const app = express();
 
@@ -23,8 +27,10 @@ app.use(express.json());
 
 //ROUTES
 
+app.use(fileUpload());
+
 app.get("/", async (req, res) => {
-  const photos = await Photo.find({});
+  const photos = await Photo.find({}).sort("-dateCreated");
   res.render("index", { photos });
 });
 
@@ -46,8 +52,28 @@ app.get("/add", (req, res) => {
 });
 
 app.post("/photos", async (req, res) => {
-  await Photo.create(req.body);
-  res.redirect("/");
+  // console.log(req.files.image);
+  //   await Photo.create(req.body);
+  //   res.redirect("/");
+
+  const uploadDir = "public/uploads";
+
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+  }
+
+  let uploadedImage = req.files.image;
+
+  let uploadedPath = __dirname + "/public/uploads/" + uploadedImage.name;
+
+  uploadedImage.mv(uploadedPath, async () => {
+    await Photo.create({
+      ...req.body,
+      image: "/uploads/" + uploadedImage.name,
+    });
+
+    res.redirect("/");
+  });
 });
 
 const port = 3000;
