@@ -4,9 +4,11 @@ const mongoose = require("mongoose");
 
 const fileUpload = require("express-fileupload");
 
-const Photo = require("./models/Photo");
+const methodOverride = require("method-override");
 
-const fs = require("fs");
+const photoController = require("./controllers/photoControllers");
+
+const pageController = require("./controllers/pageControllers");
 
 const app = express();
 
@@ -25,56 +27,27 @@ app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(methodOverride("_method"));
+
 //ROUTES
 
 app.use(fileUpload());
 
-app.get("/", async (req, res) => {
-  const photos = await Photo.find({}).sort("-dateCreated");
-  res.render("index", { photos });
-});
+app.get("/", photoController.getAllPhotos);
 
-app.get("/photos/:id", async (req, res) => {
-  // console.log(req.params.id);
-  // res.render("about");
+app.get("/photos/:id", photoController.getPhoto);
 
-  const photo = await Photo.findById(req.params.id);
+app.post("/photos", photoController.createPhoto);
 
-  res.render("photo", { photo });
-});
+app.put("/photos/:id", photoController.updatePhoto);
 
-app.get("/about", (req, res) => {
-  res.render("about");
-});
+app.delete("/photos/:id", photoController.deletePhoto);
 
-app.get("/add", (req, res) => {
-  res.render("add");
-});
+app.get("/about", pageController.getAboutPage);
 
-app.post("/photos", async (req, res) => {
-  // console.log(req.files.image);
-  //   await Photo.create(req.body);
-  //   res.redirect("/");
+app.get("/add", pageController.getAddPage);
 
-  const uploadDir = "public/uploads";
-
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-  }
-
-  let uploadedImage = req.files.image;
-
-  let uploadedPath = __dirname + "/public/uploads/" + uploadedImage.name;
-
-  uploadedImage.mv(uploadedPath, async () => {
-    await Photo.create({
-      ...req.body,
-      image: "/uploads/" + uploadedImage.name,
-    });
-
-    res.redirect("/");
-  });
-});
+app.get("/photos/edit/:id", pageController.getEditPage);
 
 const port = 3000;
 
